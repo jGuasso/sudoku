@@ -54,6 +54,11 @@
 #define TEXT_CONCEALED "\033[8m" //o texto some, não sei oq faz
 #define TEXT_CROSSEDOUT "\033[9m"
 
+// Limpar a tela
+//\x1B[2J limpa a tela
+//\x1B[H volta o cursor para o inicio
+#define TEXT_CLEAR "\x1B[2J\x1B[H"
+
 // Reset
 #define RESET "\033[0m"
 

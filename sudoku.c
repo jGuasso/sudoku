@@ -14,6 +14,16 @@ seletor tela=0;
 seletor op=0;//'opção' do menu
 seletor dif=0;//dificuldade
 
+int verificar_vitoria();
+int verifica_geracao();
+int gerar();
+void gerar_tabuleiro();
+void tela_menu();
+void menu(char ch);
+void tela_jogo(char jogo[9][9]);
+void jogo_teclado(char ch);
+
+
 int verificar_vitoria(){
     int quadrados[9][9];
     for (int i = 0; i < 3; i++)
@@ -97,43 +107,43 @@ int verifica_geracao(){
 
 }
 
-void gerar(){
-    time_t inicio = time(NULL);
-    time_t fim;
-    srand(time(NULL));
-    memset(tabuleiro,' ',81);
-    int cont=0;
-    for (int i = 0; i < 9; i++)
-    {
-        for (int j = 0; j < 9; j++)
-        {
-            tabuleiro[i][j]= (rand()%9)+49;
-            if (!verifica_geracao())
-            {
-                tabuleiro[i][j]=' ';
-                j--;
-                cont++;
+// Função para embaralhar um array de números
+void embaralhar(char *numeros, int tamanho) {
+    for (int i = 0; i < tamanho; i++) {
+        int j = rand() % (i + 1);
+        char temp = numeros[i];
+        numeros[i] = numeros[j];
+        numeros[j] = temp;
+    }
+}
+
+
+int gerar(int linha, int coluna){
+
+
+    if (linha==9) return verifica_geracao();
+
+    int prox_coluna = (coluna + 1) % 9;
+    int prox_linha = (prox_coluna == 0 ) ? linha + 1 : linha;
+    
+    char numeros[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
+    embaralhar(numeros, 9);
+    for (int i = 0; i < 9; i++) {
+        if (verifica_geracao()) {
+            tabuleiro[linha][coluna] = numeros[i];
+            if (gerar(prox_linha, prox_coluna)) {
+                return 1;
             }
-            else cont = 0;
-            if (cont>9)
-            {
-                memset(tabuleiro[i],' ',9);
-                j=-1;
-                cont=0;
-            }
-            fim= time(NULL);
-            if(difftime(inicio,fim)>2){
-            memset(tabuleiro,' ',81);
-            j=-1;
-            i=0;
-            srand(time(NULL));
-            }
+            tabuleiro[linha][coluna] = ' '; // Backtracking
         }
     }
+    return 0;
 
 }
 
+
 void gerar_tabuleiro(){
+    printf("\nLoading...");
     char padrao[9][9] = {//Padrao enquanto o gerador não está pronto
         {'4', ' ', ' ', '9', '3', '6', '1', ' ', ' '},
         {'3', '8', ' ', '5', '1', ' ', '4', '9', '6'},
@@ -145,19 +155,20 @@ void gerar_tabuleiro(){
         {' ', '9', '1', ' ', '8', ' ', '2', '3', '7'},
         {'7', '4', '3', '2', ' ', ' ', '6', ' ', '5'}
     };
+    memset(tabuleiro,' ',81);
     int retirados=0;
     switch (dif)
     {
         case 1:
-        gerar();
+        while (!gerar(0,0));
         retirados=((rand()%41)+5);
         break;
         case 2:
-        gerar();
+        while (!gerar(0,0));
         retirados=((rand()%16)+45);
         break;
         case 3:
-        gerar();
+        while (!gerar(0,0));
         retirados=((rand()%8)+60);
         break;
     default:
@@ -171,6 +182,7 @@ void gerar_tabuleiro(){
         }
         break;
     }
+    printf(TEXT_CLEAR);
     memcpy(solucao,tabuleiro,81);
     
     for (int i = 0; i < retirados; i++)
@@ -379,7 +391,7 @@ int main(){
     char ch;
     tela_menu();
      while ((ch = _getch()) != 27){//ESC = 27
-        printf("\x1B[2J\x1B[H");
+        printf(TEXT_CLEAR);
         //\x1B[2J limpa a tela
         //\x1B[H volta o cursor para o inicio
 
@@ -402,7 +414,6 @@ int main(){
             tela_jogo(tabuleiro);
             break;
         }
-    printf("\n\n%d\n",ch);
      }
 }
 /*

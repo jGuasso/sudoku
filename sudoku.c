@@ -388,6 +388,7 @@ void jogo_teclado(char ch){
 }
 
 int main(){
+    srand(time(NULL));
     char ch;
     tela_menu();
      while ((ch = _getch()) != 27){//ESC = 27
